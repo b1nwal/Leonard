@@ -1,20 +1,60 @@
 # This is where most things are happening. The model is defined here, all methods are invoked from here.
 
 import tensorflow as tf
-import numpy as np
+from hyperparameters import hyperparameters
 
-hyperparameters = {
-    "learning_rate": 1e-3,
-    "batch_size": 32,
-    "train_dataset_size": 15000,
-    "corpus_callosum": 0.0,
-    "replay_max_probability": 0.8,
-    "replay_buffer_length": 1000,
-    "jitter_multiplier": 0.01,
-}
-
-armparameters = {
-    "seglengths": [1,1,1,1,1],
-}
+import train
+import pipeline
 
 
+class Leonard(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        
+        self.D2 = tf.keras.layers.Dense(192)
+        self.BN2 = tf.keras.layers.BatchNormalization()
+        # activation
+        
+        self.D3 = tf.keras.layers.Dense(192)
+        self.BN3 = tf.keras.layers.BatchNormalization()
+        # activation
+        
+        self.D4 = tf.keras.layers.Dense(192)
+        self.BN4 = tf.keras.layers.BatchNormalization()
+        # activation
+        
+        self.corpus_callosum = tf.keras.layers.Dropout(hyperparameters["corpus_callosum"])
+        
+        self.D5 = tf.keras.layers.Dense(192)
+        self.BN5 = tf.keras.layers.BatchNormalization()
+        # activation
+        
+        self.D6 = tf.keras.layers.Dense(192)
+        self.BN6 = tf.keras.layers.BatchNormalization()
+        # activation
+        
+        self.D7 = tf.keras.layers.Dense(5,kernel_regularizer="l2",dtype="float32")
+        
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=hyperparameters["learning_rate"])
+        self.kicked_in = False
+        # self.collecting = false
+    def call(self,x,training=False):
+        # x /= 5
+        y = tf.keras.activations.swish(self.D2(x))
+        y = tf.keras.activations.swish(self.D3(y))
+        y = tf.keras.activations.swish(self.D4(y))
+        y = self.corpus_callosum(y,training=training)
+        y = tf.keras.activations.swish(self.D5(y))
+        y = tf.keras.activations.swish(self.D6(y))
+        y = self.D7(y)
+        return y
+
+    @tf.function
+    def grads(self, g):
+        self.optimizer.apply_gradients(zip(g, self.trainable_variables))
+        
+leo = Leonard()
+
+dataset = pipeline.coord_dataset
+
+train.train(leo,dataset)
