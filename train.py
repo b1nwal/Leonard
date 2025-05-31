@@ -3,7 +3,7 @@ import tensorflow as tf
 import pipeline
 from hyperparameters import hyperparameters
 
-dataset = pipeline.coord_dataset
+dataset = pipeline.coord_dataset.take(hyperparameters["train_dataset_size"])
 
 
 @tf.function
@@ -44,11 +44,8 @@ def fwd(rotation_angles): # I am coming back for you: you will be so optimized l
     return b
 
 def train(model):
-    for f,x in enumerate(dataset):
-        h = hyperparameters["train_dataset_size"]
-        percentage = int((f/hyperparameters["train_dataset_size"])*20)
-        mloss = tf.reduce_mean(loss)
-        print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}, Sampl. Loss: {l:.4f}, Max Loss: {mxl:.4f}".format(f=f,l=mloss,h=hyperparameters["train_dataset_size"]),end="")
+    h = hyperparameters["train_dataset_size"]
+    for f,x in enumerate(dataset,1):
         fx = fwd(x)
         with tf.GradientTape() as tape:
             y = model.call(fx,training=True)
@@ -56,6 +53,10 @@ def train(model):
         gradient = tape.gradient(loss, model.trainable_variables)
         model.grads(gradient)
         # mmax = tf.reduce_max(loss)
+        percentage = int((f/hyperparameters["train_dataset_size"])*20)
+        mloss = tf.reduce_mean(loss)
+        
+        print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}, Sampl. Loss: {l:.4f}".format(f=f,l=mloss,h=hyperparameters["train_dataset_size"]),end="")
 
         # if f%1000==0:
             # model.save(("")) # TODO make sure to fill this in before saving
