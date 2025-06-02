@@ -47,7 +47,7 @@ def fwd(rotation_angles): # I am coming back for you: you will be so optimized l
     return b
 
 def train(model):
-    session = base64.b64encode(datetime.datetime.now().ctime().encode('utf-8'))
+    session = base64.b64encode(datetime.datetime.now().ctime().encode('utf-8')).decode('utf-8')
     for f,x in enumerate(dataset,1):
         fx = fwd(x)
         with tf.GradientTape() as tape:
@@ -62,4 +62,4 @@ def train(model):
         print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}, Sampl. Loss: {l:.4f}".format(f=f,l=mloss,h=hyperparameters["train_dataset_size"]),end="")
 
         if f%1000==0:
-            model.save(("leo_v1-2-4/saves/" + session + ".h5"))
+            model.save(("leo_v1-2-4/" + session + ".keras"))
