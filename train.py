@@ -1,7 +1,7 @@
 import tensorflow as tf
 import base64
 import datetime
-
+import os
 
 import pipeline
 from hyperparameters import hyperparameters
@@ -46,7 +46,11 @@ def fwd(rotation_angles): # I am coming back for you: you will be so optimized l
     b = tf.reduce_sum(a,axis=2)
     return b
 
+logstr = "logs/profile"
+os.makedirs(logstr,exist_ok=True)
+
 def train(model):
+    tf.profiler.experimental.start(logdir=logstr)
     session = base64.b64encode(datetime.datetime.now().ctime().encode('utf-8')).decode('utf-8')
     for f,x in enumerate(dataset,1):
         fx = fwd(x)
@@ -63,3 +67,4 @@ def train(model):
 
         if f%1000==0:
             model.save(("leo_v1-2-4/" + session + ".keras"))
+    tf.profiler.experimental.stop()
