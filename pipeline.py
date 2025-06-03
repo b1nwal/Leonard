@@ -11,5 +11,5 @@ replay_max_len = hyperparameters["replay_buffer_length"]
 train_dataset_size = hyperparameters["train_dataset_size"]
 
 
-data_tensor = tf.random.Generator.uniform(minval=-np.pi, maxval=np.pi, shape=(hyperparameters["batch_size"] * hyperparameters["train_dataset_size"],5))
+data_tensor = tf.random.Generator.from_seed(6136).uniform(minval=-np.pi, maxval=np.pi, shape=(hyperparameters["batch_size"] * hyperparameters["train_dataset_size"],5))
 coord_dataset = tf.data.Dataset.from_tensor_slices(data_tensor).batch(hyperparameters["batch_size"]).prefetch(tf.data.AUTOTUNE)
