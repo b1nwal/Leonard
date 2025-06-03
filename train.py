@@ -51,7 +51,7 @@ def train(model):
     for f,x in enumerate(dataset,1):
         fx = fwd(x)
         with tf.GradientTape() as tape:
-            y = model(fx,training=True)
+            y = model.call(fx,training=True)
             loss = eudist(fwd(y),fx)
         gradient = tape.gradient(loss, model.trainable_variables)
         model.grads(gradient)
