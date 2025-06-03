@@ -94,7 +94,6 @@ class Leonard(tf.keras.Model):
 
     @tf.function
     def train_step(self, x):
-        tf.print(x.device)
         fx = fwd(x)
         with tf.GradientTape() as tape:
             y = self.call(fx,training=True)
@@ -102,7 +101,7 @@ class Leonard(tf.keras.Model):
         gradient = tape.gradient(loss, self.trainable_variables)
         self.grads(gradient)
         # mmax = tf.reduce_max(loss)
-        return tf.reduce_mean(loss)
+        # return tf.reduce_mean(loss)
 
 
 leo = Leonard()
@@ -115,10 +114,9 @@ os.makedirs(logstr,exist_ok=True)
 tf.profiler.experimental.start(logdir=logstr)
 session = base64.b64encode(datetime.datetime.now().ctime().encode('utf-8')).decode('utf-8')
 for f,x in enumerate(dataset,1):
-    mloss = leo.train_step(x)
-    print(mloss.device)
+    leo.train_step(x)
     percentage = int((f/hyperparameters["train_dataset_size"])*20)
-    print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}, Sampl. Loss: {l:.4f}".format(f=f,l=mloss,h=hyperparameters["train_dataset_size"]),end="")
+    print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}".format(f=f,h=hyperparameters["train_dataset_size"]),end="")
 
     if f%1000==0:
         leo.save(("leo_v1-2-4/" + session + ".keras"))
