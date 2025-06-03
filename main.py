@@ -113,6 +113,7 @@ os.makedirs(logstr,exist_ok=True)
 tf.profiler.experimental.start(logdir=logstr)
 session = base64.b64encode(datetime.datetime.now().ctime().encode('utf-8')).decode('utf-8')
 for f,x in enumerate(dataset,1):
+    print(x.device)
     mloss = leo.train_step(x)
     percentage = int((f/hyperparameters["train_dataset_size"])*20)
     print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}, Sampl. Loss: {l:.4f}".format(f=f,l=mloss,h=hyperparameters["train_dataset_size"]),end="")
