@@ -103,7 +103,9 @@ class Leonard(tf.keras.Model):
         # mmax = tf.reduce_max(loss)
         return tf.reduce_mean(loss)
 
-leo = Leonard()
+with tf.device('/GPU:0'):
+    leo = Leonard()
+
 
 dataset = pipeline.coord_dataset.take(hyperparameters["train_dataset_size"])
 
