@@ -94,6 +94,7 @@ class Leonard(tf.keras.Model):
 
     @tf.function
     def train_step(self, x):
+        tf.print(x.device)
         fx = fwd(x)
         with tf.GradientTape() as tape:
             y = self.call(fx,training=True)
@@ -106,8 +107,7 @@ class Leonard(tf.keras.Model):
 
 leo = Leonard()
 
-with tf.device('/GPU:0'):
-    dataset = pipeline.coord_dataset.take(hyperparameters["train_dataset_size"])
+dataset = pipeline.coord_dataset.take(hyperparameters["train_dataset_size"])
 
 logstr = "logs/profile"
 os.makedirs(logstr,exist_ok=True)
