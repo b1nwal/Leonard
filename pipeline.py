@@ -10,6 +10,7 @@ replay_max_prob = hyperparameters["replay_max_probability"]
 replay_max_len = hyperparameters["replay_buffer_length"]
 train_dataset_size = hyperparameters["train_dataset_size"]
 
-
-data_tensor = tf.random.Generator.from_seed(6136).uniform(minval=-np.pi, maxval=np.pi, shape=(hyperparameters["batch_size"] * hyperparameters["train_dataset_size"],5))
+initangles = tf.random.Generator.from_seed(6136).uniform(minval=-np.pi, maxval=np.pi, shape=(hyperparameters["batch_size"] * hyperparameters["train_dataset_size"],5),dtype="float32")
+baseangles = tf.random.Generator.from_seed(798723).uniform(minval=-np.pi, maxval=np.pi, shape=(hyperparameters["batch_size"] * hyperparameters["train_dataset_size"],5),dtype="float32")
+data_tensor = tf.concat((initangles,baseangles),axis=1)
 coord_dataset = tf.data.Dataset.from_tensor_slices(data_tensor).batch(hyperparameters["batch_size"]).prefetch(tf.data.AUTOTUNE)
