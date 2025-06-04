@@ -101,27 +101,20 @@ class Leonard(tf.keras.Model):
         gradient = tape.gradient(loss, self.trainable_variables)
         self.grads(gradient)
         # mmax = tf.reduce_max(loss)
-        # return tf.reduce_mean(loss)
+        return tf.reduce_mean(loss)
 
 
 leo = Leonard()
-
-
 
 dataset = pipeline.coord_dataset.take(hyperparameters["train_dataset_size"])
 
 leo(fwd(tf.random.Generator.from_seed(6678).uniform(minval=-1, maxval=1, shape=(hyperparameters["batch_size"],5))))
 
-logstr = "logs/profile"
-os.makedirs(logstr,exist_ok=True)
-
-tf.profiler.experimental.start(logdir=logstr)
 session = base64.b64encode(datetime.datetime.now().ctime().encode('utf-8')).decode('utf-8')
 for f,x in enumerate(dataset,1):
-    leo.train_step(x)
+    mloss = leo.train_step(x)
     percentage = int((f/hyperparameters["train_dataset_size"])*20)
-    print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}".format(f=f,h=hyperparameters["train_dataset_size"]),end="")
+    print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}, Loss: {m:.2f}".format(f=f,m=mloss,h=hyperparameters["train_dataset_size"]),end="")
 
     if f%1000==0:
         leo.save(("leo_v1-2-4/" + session + ".keras"))
-tf.profiler.experimental.stop()
