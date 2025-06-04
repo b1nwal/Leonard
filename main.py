@@ -4,6 +4,7 @@ import tensorflow as tf
 import base64
 import datetime
 import os
+import numpy as np
 
 import pipeline
 from hyperparameters import hyperparameters
@@ -93,28 +94,28 @@ class Leonard(tf.keras.Model):
         
 
     @tf.function
-    def train_step(self, x):
-        fx = fwd(x)
+    def train_step(self, f, x, rs):
         with tf.GradientTape() as tape:
-            y = self.call(fx,training=True)
-            loss = eudist(fwd(y),fx)
+            fx = fwd(x)
+            y = self.call(tf.concat((fx,rs),axis=1),training=True)
+            rotsum = tf.reduce_sum(abs(rs - y),axis=0)
+            loss = eudist(fwd(y),fx) + hyperparameters["motion_penalty_multiplier"] * (f / hyperparameters["train_dataset_size"] ) * rotsum
         gradient = tape.gradient(loss, self.trainable_variables)
         self.grads(gradient)
         # mmax = tf.reduce_max(loss)
-        return tf.reduce_mean(loss)
+        return (tf.reduce_mean(loss), tf.reduce_mean(rotsum))
 
 
 leo = Leonard()
 
 dataset = pipeline.coord_dataset.take(hyperparameters["train_dataset_size"])
-
-leo(fwd(tf.random.Generator.from_seed(6678).uniform(minval=-1, maxval=1, shape=(hyperparameters["batch_size"],5))))
+np.set_printoptions(threshold=1000, linewidth=200)   # set wide line
 
 session = base64.b64encode(datetime.datetime.now().ctime().encode('utf-8')).decode('utf-8')
 for f,x in enumerate(dataset,1):
-    mloss = leo.train_step(x)
+    mloss, rd = leo.train_step(tf.constant([f],dtype="float32"), x[:,:5],x[:,5:])
     percentage = int((f/hyperparameters["train_dataset_size"])*20)
-    print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}, Loss: {m:.2f}".format(f=f,m=mloss,h=hyperparameters["train_dataset_size"]),end="")
+    print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}, Loss: {m:.2f}, Rotation Delta: {rd:.2f}".format(rd=rd,f=f,m=mloss,h=hyperparameters["train_dataset_size"]),end="")
 
     if f%1000==0:
         leo.save(("leo_v1-2-4/" + session + ".keras"))

@@ -6,6 +6,7 @@ hyperparameters = {
     "replay_max_probability": 0.8,
     "replay_buffer_length": 1000,
     "jitter_multiplier": 0.01,
+    "motion_penalty_multiplier": 0.2,
 }
 
 armparameters = {
