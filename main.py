@@ -98,12 +98,12 @@ class Leonard(tf.keras.Model):
         with tf.GradientTape() as tape:
             fx = fwd(x)
             y = self.call(tf.concat((fx,rs),axis=1),training=True)
-            rotsum = tf.reduce_sum(abs(rs - y),axis=0)
-            loss = eudist(fwd(y),fx) + hyperparameters["motion_penalty_multiplier"] * (f / hyperparameters["train_dataset_size"] ) * rotsum
+            rotsum = tf.reduce_sum(abs(rs - y),axis=1)
+            loss = eudist(fwd(y),fx) + (hyperparameters["motion_penalty_multiplier"] * (f / hyperparameters["train_dataset_size"])) * rotsum
         gradient = tape.gradient(loss, self.trainable_variables)
         self.grads(gradient)
         # mmax = tf.reduce_max(loss)
-        return (tf.reduce_mean(loss), tf.reduce_mean(rotsum))
+        return (tf.reduce_mean(loss), 0)
 
 
 leo = Leonard()
