@@ -103,7 +103,7 @@ class Leonard(tf.keras.Model):
         gradient = tape.gradient(loss, self.trainable_variables)
         self.grads(gradient)
         # mmax = tf.reduce_max(loss)
-        return (tf.reduce_mean(loss), 0)
+        return (tf.reduce_mean(loss), tf.reduce_mean(rotsum))
 
 
 leo = Leonard()
