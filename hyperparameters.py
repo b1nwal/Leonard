@@ -1,6 +1,6 @@
 hyperparameters = {
     "learning_rate": 1e-3,
-    "batch_size": 256,
+    "batch_size": 128,
     "train_dataset_size": 200000,
     "corpus_callosum": 0.0,
     "replay_max_probability": 0.8,
