@@ -106,7 +106,11 @@ class Leonard(tf.keras.Model):
 
 leo = Leonard()
 
+
+
 dataset = pipeline.coord_dataset.take(hyperparameters["train_dataset_size"])
+
+leo(fwd(tf.random.Generator.from_seed(6678).uniform(minval=-1, maxval=1, shape=(hyperparameters["batch_size"],5))))
 
 logstr = "logs/profile"
 os.makedirs(logstr,exist_ok=True)
