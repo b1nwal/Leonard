@@ -34,13 +34,22 @@ def fwd(rotation_angles): # I am coming back for you: you will be so optimized l
     rotary2_matrices = tf.matmul(joint2_matrices, tf.vectorized_map(build_rotary_matrix, t[3],fallback_to_while_loop=False))
     joint3_matrices = tf.matmul(rotary2_matrices, tf.vectorized_map(build_joint_matrix, t[4],fallback_to_while_loop=False))
     
-    segd = tf.constant([[0],[1],[0]],dtype="float32") # TODO change this to match arm measurements
     
-    seg1 = tf.matmul(rotary1_matrices, segd)
-    seg2 = tf.matmul(joint1_matrices, segd)
-    seg3 = tf.matmul(joint2_matrices, segd)
-    seg4 = tf.matmul(rotary2_matrices, segd)
-    seg5 = tf.matmul(joint3_matrices, segd)
+    segd = tf.constant([[0,0,0,0,0],[1.17481,1.5,1.,1.,.8],[0,0,0,0,0]],dtype="float32") # TODO change this to match arm measurements
+    segd1 = tf.constant([[0],[1.17481],[0]],dtype="float32")
+    segd2 = tf.constant([[0],[1.5],[0]],dtype="float32")
+    segd3 = tf.constant([[0],[1.],[0]],dtype="float32")
+    segd4 = tf.constant([[0],[1.],[0]],dtype="float32")
+    segd5 = tf.constant([[0],[.8],[0]],dtype="float32")
+
+    # 117.481
+    # 150
+    # 200
+    seg1 = tf.matmul(rotary1_matrices, segd1)
+    seg2 = tf.matmul(joint1_matrices, segd2)
+    seg3 = tf.matmul(joint2_matrices, segd3)
+    seg4 = tf.matmul(rotary2_matrices, segd4)
+    seg5 = tf.matmul(joint3_matrices, segd5)
     
     a = tf.concat([seg1,seg2,seg3,seg4,seg5],axis=2)
     b = tf.reduce_sum(a,axis=2)
