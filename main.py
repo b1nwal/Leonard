@@ -128,4 +128,4 @@ for f,x in enumerate(dataset,1):
     print("\r["+"="*percentage + ">" + " "*(20-percentage) + "]","Sample: {f}/{h}, Loss: {m:.2f}, Rotation Delta: {rd:.2f}, Dist: {dist:.2f}".format(dist=dist,rd=rd,f=f,m=mloss,h=hyperparameters["train_dataset_size"]),end="")
 
     if f%1000==0:
-        leo.save(("leo_v1-2-4/" + session + ".keras"))
+        leo.save(("leo_v1-2-4/" + session + ".h5"))
